@@ -4,8 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const { Queue } = require("bullmq"); // Added for getJobProgress
 
-// Connection to Redis for BullMQ
-const connection = { host: "127.0.0.1", port: 6379 };
+const connection = require("../../config/redis");
 
 const downloadsDir = path.join(__dirname, "../../../downloads");
 

@@ -1,15 +1,11 @@
 // src/queues/worker.js
 const { Queue } = require("bullmq");
 
-// Redis connection options
-const redisOptions = {
-  host: "127.0.0.1",
-  port: 6379,
-};
+const connection = require("../config/redis");
 
 // Create and export the download queue
 const downloadQueue = new Queue("download", {
-  connection: redisOptions,
+  connection,
   defaultJobOptions: {
     removeOnComplete: true,
     removeOnFail: false,
