@@ -11,6 +11,7 @@ const downloadRoutes = require("./api/routes/download.routes");
 
 const app = express();
 
+app.set('trust proxy', 1); // Enable this because Railway uses a reverse proxy
 app.use(cors());
 app.use(express.json());
 app.use(limiter);
