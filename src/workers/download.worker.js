@@ -5,8 +5,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const { downloadStore } = require("../utils/downloadStore");
-
-const connection = { host: "127.0.0.1", port: 6379 };
+const connection = require("../config/redis");
 const FFMPEG_PATH = "C:\\ffmpeg-8.0.1-essentials_build\\bin";
 
 const downloadsDir = path.join(__dirname, "../../downloads");
