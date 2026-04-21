@@ -1,4 +1,4 @@
-FROM node:18-bullseye
+FROM node:18-bookworm
 
 # Install ffmpeg and python3 (required for yt-dlp)
 RUN apt-get update && \
