@@ -6,7 +6,6 @@ const fs = require("fs");
 const crypto = require("crypto");
 const { downloadStore } = require("../utils/downloadStore");
 const connection = require("../config/redis");
-const FFMPEG_PATH = "C:\\ffmpeg-8.0.1-essentials_build\\bin";
 
 const downloadsDir = path.join(__dirname, "../../downloads");
 if (!fs.existsSync(downloadsDir)) fs.mkdirSync(downloadsDir, { recursive: true });
@@ -52,7 +51,6 @@ new Worker(
       args.push("-f", "bestaudio"); // ONLY audio stream
       args.push("--extract-audio");
       args.push("--audio-format", audioFormat);
-      args.push("--ffmpeg-location", FFMPEG_PATH);
 
       // ⚠️ IMPORTANT: Use fixed output path (NO template)
       args.push("-o", `"${finalPath}"`);
