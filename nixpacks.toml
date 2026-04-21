@@ -1,2 +1,13 @@
+providers = ["node"]
+
 [phases.setup]
 nixPkgs = ["...", "ffmpeg", "yt-dlp"]
+
+[phases.install]
+cmds = ["npm install"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "node server.js"
