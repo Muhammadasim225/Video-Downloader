@@ -2,6 +2,7 @@ const { nanoid } = require("nanoid");
 const path = require("path");
 const fs = require("fs");
 const downloadQueue = require("../../queues/download.queue");
+const { downloadStore } = require("../../utils/downloadStore");
 
 // Downloads directory
 const downloadsDir = path.join(__dirname, "../../../downloads");
@@ -11,16 +12,12 @@ if (!fs.existsSync(downloadsDir)) {
   fs.mkdirSync(downloadsDir, { recursive: true });
 }
 
-// In-memory token storage (use DB/Redis in production)
-const downloadTokens = new Map();
-exports.downloadTokens = downloadTokens;
-
 /**
  * Start video download
  */
 exports.downloadVideo = async (req, res) => {
   try {
-    const { url, format } = req.body;
+    const { url, format } = req.body || {};
 
     if (!url || !format) {
       return res.status(400).json({
@@ -39,18 +36,21 @@ exports.downloadVideo = async (req, res) => {
     // Generate secure token
     const token = nanoid(12);
 
+    // Initial placeholder in downloadStore
+    downloadStore.set(token, {
+      ready: false,
+      originalName: fileName,
+      path: path.join(downloadsDir, fileName),
+      createdAt: Date.now()
+    });
+
     // Add job to queue
     const job = await downloadQueue.add("download-video", {
       url,
       format,
       fileName,
-    });
-
-    // Store token → job info
-    downloadTokens.set(token, {
-      fileName,
-      jobId: job.id,
-      createdAt: Date.now(),
+      token,
+      originalName: fileName
     });
 
     const protocol = req.protocol;

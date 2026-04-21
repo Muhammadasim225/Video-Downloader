@@ -22,11 +22,10 @@ new Worker(
   "download-video",
   async (job) => {
     console.log("📥 JOB RECEIVED:", job.data);
-    const { url, format, fileName } = job.data;
+    const { url, format, fileName, token, originalName } = job.data;
     const finalPath = path.join(downloadsDir, fileName);
-    // Mark token in store as not ready yet
-    // When download completes
-    downloadStore.set(token, { path: finalPath, ready: true, originalName });    // Use temp filename or template
+
+    // Use temp filename or template
     let tempPath;
     if (format.startsWith("hls-") || format.startsWith("dash-")) {
       const name = path.basename(fileName, path.extname(fileName));
@@ -135,6 +134,14 @@ new Worker(
 
               console.log(`✅ Download complete: ${fileName}`);
               job.updateProgress(100);
+              
+              if (token) {
+                downloadStore.set(token, {
+                  ready: true,
+                  path: finalPath,
+                  originalName: originalName || fileName
+                });
+              }
 
               resolve({ success: true, fileName });
 
