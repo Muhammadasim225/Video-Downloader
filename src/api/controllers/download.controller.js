@@ -1,4 +1,4 @@
-const { nanoid } = require("nanoid");
+const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
 const downloadQueue = require("../../queues/download.queue");
@@ -34,7 +34,7 @@ exports.downloadVideo = async (req, res) => {
     )}.${fileExt}`;
 
     // Generate secure token
-    const token = nanoid(12);
+    const token = crypto.randomBytes(6).toString("hex");
 
     // Initial placeholder in downloadStore
     downloadStore.set(token, {
