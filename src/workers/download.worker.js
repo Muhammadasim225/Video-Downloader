@@ -57,10 +57,11 @@ new Worker(
 
     } else {
       // Handle HLS/DASH properly
+      const fileBaseName = path.parse(fileName).name; // e.g. 1776793025952-3322
+      
       if (format.startsWith("hls") || format.includes("HLS")) {
         args.push("-f", `${format}+bestaudio`);
-        // ⚠️ allow multiple fragments → REQUIRED FIX
-        args.push("-o", `"${path.join(downloadsDir, "%(title)s-%(id)s.%(ext)s")}"`);
+        args.push("-o", `"${path.join(downloadsDir, `${fileBaseName}.%(ext)s`)}"`);
 
       } else {
         // ✅ ALWAYS combine video + audio
@@ -68,7 +69,7 @@ new Worker(
         args.push("--merge-output-format", "mp4");
 
         // ✅ REQUIRED for HLS/DASH (prevents crash)
-        args.push("-o", `"${path.join(downloadsDir, "%(title)s-%(id)s.%(ext)s")}"`);
+        args.push("-o", `"${path.join(downloadsDir, `${fileBaseName}.%(ext)s`)}"`);
       }
     }
 
@@ -121,7 +122,13 @@ new Worker(
               // wait a bit (important for Windows file locks)
               await new Promise(res => setTimeout(res, 1000));
               const files = fs.readdirSync(downloadsDir);
-              const downloadedFile = files.find(f => f.includes(".mp4"));
+              const fileBaseName = path.parse(fileName).name;
+              
+              // Find the EXACT file yt-dlp just created for this job
+              const downloadedFile = files.find(f => 
+                  f.startsWith(fileBaseName) && 
+                  (f.endsWith(".mp4") || f.endsWith(".webm") || f.endsWith(".mkv") || f.endsWith(".m4a"))
+              );
 
               if (downloadedFile) {
                 await safeRename(
