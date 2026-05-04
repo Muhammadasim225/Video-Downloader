@@ -82,15 +82,16 @@ exports.serveDownload = async (req, res) => {
   try {
     const { token } = req.params;
 
-    if (!downloadTokens.has(token)) {
+    if (!downloadStore.has(token)) {
       return res.status(404).json({
         success: false,
         message: "Invalid or expired link",
       });
     }
 
-    const { fileName } = downloadTokens.get(token);
-    const filePath = path.join(downloadsDir, fileName);
+    const fileData = downloadStore.get(token);
+    const fileName = fileData.originalName || "video.mp4";
+    const filePath = fileData.path;
 
     // File not ready yet
     if (!fs.existsSync(filePath)) {
@@ -119,7 +120,7 @@ exports.serveDownload = async (req, res) => {
       });
 
       // Remove token so it can't be reused
-      downloadTokens.delete(token);
+      downloadStore.delete(token);
     });
   } catch (err) {
     console.error("Serve download error:", err);

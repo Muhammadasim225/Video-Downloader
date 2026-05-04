@@ -1,5 +1,5 @@
 // src/api/controllers/job.controller.js
-const { downloadTokens } = require("./download.controller");
+const { downloadStore } = require("../../utils/downloadStore");
 const path = require("path");
 const fs = require("fs");
 const { Queue } = require("bullmq"); // Added for getJobProgress
@@ -15,12 +15,13 @@ exports.getJobStatus = async (req, res) => {
   try {
     const { id: token } = req.params;
 
-    if (!downloadTokens.has(token)) {
+    if (!downloadStore.has(token)) {
       return res.status(404).json({ success: false, message: "Invalid token" });
     }
 
-    const { fileName } = downloadTokens.get(token);
-    const filePath = path.join(downloadsDir, fileName);
+    const tokenData = downloadStore.get(token);
+    const fileName = tokenData.originalName || tokenData.fileName || "unknown";
+    const filePath = tokenData.path || path.join(downloadsDir, fileName);
     const ready = fs.existsSync(filePath);
 
     console.log("Checking file:", filePath);
@@ -40,7 +41,7 @@ exports.getJobProgress = async (req, res) => {
   try {
     const { token } = req.params;
 
-    const tokenData = downloadTokens.get(token);
+    const tokenData = downloadStore.get(token);
     if (!tokenData || !tokenData.jobId) {
       return res.status(404).json({ success: false, message: "Invalid token" });
     }

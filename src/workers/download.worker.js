@@ -73,7 +73,7 @@ new Worker(
       }
     }
 
-    args.push(url);
+    args.push(`"${url}"`);
 
     console.log(`🚀 Download job started: ${fileName}`);
     console.log("yt-dlp args:", args.join(" "));
